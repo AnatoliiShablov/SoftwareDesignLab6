@@ -25,7 +25,8 @@ class Token : public std::enable_shared_from_this<Token> {
 class BraceToken : public Token {
  public:
   enum class Type { Left, Right };
-  constexpr BraceToken(Type type) noexcept;
+  constexpr BraceToken(Type type) noexcept : _type{type} {}
+  constexpr Type type() const noexcept { return _type; }
   void accept(std::shared_ptr<TokenVisitor> visitor) override;
 
  private:
@@ -39,7 +40,7 @@ static std::shared_ptr<Token> RBraceToken =
 
 class NumberToken : public Token {
  public:
-  constexpr NumberToken(uint64_t value) noexcept;
+  constexpr NumberToken(uint64_t value) noexcept : _value{value} {}
   void accept(std::shared_ptr<TokenVisitor> visitor) override;
 
  private:
@@ -49,29 +50,24 @@ class NumberToken : public Token {
 class OperationToken : public Token {
  public:
   enum class Type { Addition, Subtraction, Multiplication, Division };
-  constexpr OperationToken(Type type) noexcept;
+  constexpr OperationToken(Type type, uint32_t priority) noexcept
+      : _type{type}, _priority{priority} {}
+  constexpr Type type() const noexcept { return _type; }
+  constexpr uint32_t priority() const noexcept { return _priority; }
   void accept(std::shared_ptr<TokenVisitor> visitor) override;
 
  private:
   Type _type;
+  uint32_t _priority;
 };
 
 static std::shared_ptr<Token> AdditionToken =
-    std::make_shared<OperationToken>(OperationToken::Type::Addition);
+    std::make_shared<OperationToken>(OperationToken::Type::Addition, 5);
 static std::shared_ptr<Token> SubtractionToken =
-    std::make_shared<OperationToken>(OperationToken::Type::Subtraction);
+    std::make_shared<OperationToken>(OperationToken::Type::Subtraction, 5);
 static std::shared_ptr<Token> MultiplicationToken =
-    std::make_shared<OperationToken>(OperationToken::Type::Multiplication);
+    std::make_shared<OperationToken>(OperationToken::Type::Multiplication, 4);
 static std::shared_ptr<Token> DivisionToken =
-    std::make_shared<OperationToken>(OperationToken::Type::Division);
-
-class TokenVisitor : public std::enable_shared_from_this<TokenVisitor> {
- public:
-  virtual void visit(std::shared_ptr<BraceToken> token) = 0;
-  virtual void visit(std::shared_ptr<NumberToken> token) = 0;
-  virtual void visit(std::shared_ptr<OperationToken> token) = 0;
-
-  virtual ~TokenVisitor();
-};
+    std::make_shared<OperationToken>(OperationToken::Type::Division, 4);
 
 #endif

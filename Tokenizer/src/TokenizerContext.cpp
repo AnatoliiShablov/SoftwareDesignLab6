@@ -81,8 +81,10 @@ void TokenizerContext::proceedNextCharacter(int symbol) {
   _currentState->proceedCharacter(shared_from_this(), symbol);
 }
 
+void TokenizerContext::setState(std::shared_ptr<State> state) { _currentState = state; }
+
 void TokenizerContext::addToken(std::shared_ptr<Token> token) {
-  _tokens.emplace_back(std::move(token));
+    _tokens.emplace_back(std::move(token));
 }
 
 namespace {

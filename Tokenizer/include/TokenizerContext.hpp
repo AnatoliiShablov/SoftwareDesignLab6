@@ -8,7 +8,7 @@
 
 class TokenizerContext;
 
-class State : std::enable_shared_from_this<State> {
+class State : public std::enable_shared_from_this<State> {
  public:
   virtual void proceedCharacter(std::shared_ptr<TokenizerContext> context,
                                 int symbol) = 0;
@@ -46,7 +46,7 @@ static std::shared_ptr<State> EmptyStateV = std::make_shared<EmptyState>();
 static std::shared_ptr<State> ErrorStateV = std::make_shared<ErrorState>();
 static std::shared_ptr<State> EndStateV = std::make_shared<EndState>();
 
-class TokenizerContext : std::enable_shared_from_this<TokenizerContext> {
+class TokenizerContext : public std::enable_shared_from_this<TokenizerContext> {
  public:
   TokenizerContext();
 
