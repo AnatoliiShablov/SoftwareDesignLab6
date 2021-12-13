@@ -1,7 +1,9 @@
 #include <fstream>
 #include <iostream>
 
+#include "CalcVisitor.hpp"
 #include "ParserVisitor.hpp"
+#include "PrintVisitor.hpp"
 #include "TokenizerContext.hpp"
 
 int main(int argc, char* argv[]) {
@@ -25,6 +27,16 @@ int main(int argc, char* argv[]) {
                 [&parser](auto token) { token->accept(parser); });
 
   auto const& parserTokens = parser->tokens();
+
+  auto printer = std::make_shared<PrintVisitor>();
+  std::for_each(parserTokens.begin(), parserTokens.end(),
+                [&printer](auto token) { token->accept(printer); });
+
+  auto calculator = std::make_shared<CalcVisitor>();
+  std::for_each(parserTokens.begin(), parserTokens.end(),
+                [&calculator](auto token) { token->accept(calculator); });
+
+  std::cout << std::endl << calculator->result() << std::endl;
 
   return 0;
 }

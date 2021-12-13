@@ -46,11 +46,33 @@ const std::vector<std::shared_ptr<Token> > &&ParserVisitor::tokens() && {
 }
 
 void ParserVisitor::finalize() {
-  while (!_tmpTokens.empty()) {
-    if (getTopOrNull<BraceToken>()) {
-      throw std::runtime_error("Not closed brace found");
+  if (!_isFinalized) {
+    while (!_tmpTokens.empty()) {
+      if (getTopOrNull<BraceToken>()) {
+        throw std::runtime_error("Not closed brace found");
+      }
+      _tokens.emplace_back(std::move(_tmpTokens.top()));
+      _tmpTokens.pop();
     }
-    _tokens.emplace_back(std::move(_tmpTokens.top()));
-    _tmpTokens.pop();
+
+    size_t counter = 0;
+
+    for (auto const &t : _tokens) {
+      if (dynamic_cast<NumberToken *>(t.get())) {
+        ++counter;
+      }
+      if (dynamic_cast<OperationToken *>(t.get())) {
+        if (counter == 0) {
+          throw std::runtime_error("Not enough args for operation");
+        }
+        --counter;
+      }
+    }
+
+    if (counter != 1) {
+      throw std::runtime_error("Too many args");
+    }
+
+    _isFinalized = true;
   }
 }

@@ -26,6 +26,8 @@ class ParserVisitor : public TokenVisitor {
 
   std::stack<std::shared_ptr<Token>> _tmpTokens;
   std::vector<std::shared_ptr<Token>> _tokens;
+
+  bool _isFinalized{false};
 };
 
 #endif

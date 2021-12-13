@@ -41,6 +41,7 @@ static std::shared_ptr<Token> RBraceToken =
 class NumberToken : public Token {
  public:
   constexpr NumberToken(uint64_t value) noexcept : _value{value} {}
+  constexpr uint64_t value() const noexcept { return _value; }
   void accept(std::shared_ptr<TokenVisitor> visitor) override;
 
  private:
