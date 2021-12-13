@@ -1,23 +1,33 @@
 #include <fstream>
 #include <iostream>
+#include <string_view>
 
 #include "CalcVisitor.hpp"
 #include "ParserVisitor.hpp"
 #include "PrintVisitor.hpp"
 #include "TokenizerContext.hpp"
 
-int main(int argc, char* argv[]) {
-  if (argc != 2) {
-    std::cout << "Usage:\n\tSD6 INPUT_FILE" << std::endl;
-    return -1;
+void readFromStdin(std::shared_ptr<TokenizerContext> ctx) {
+  while (!std::feof(stdin)) {
+    ctx->proceedNextCharacter(std::getc(stdin));
   }
+}
 
+void readFromFile(std::shared_ptr<TokenizerContext> ctx,
+                  std::string_view fileName) {
+  std::ifstream file(fileName.data());
+  while (!file.eof()) {
+    ctx->proceedNextCharacter(file.get());
+  }
+}
+
+int main(int argc, char* argv[]) {
   auto tokenizer = std::make_shared<TokenizerContext>();
-  {
-    std::ifstream file(argv[1]);
-    while (!file.eof()) {
-      tokenizer->proceedNextCharacter(file.get());
-    }
+
+  if (argc == 2 && std::string_view(argv[1]) != "-") {
+    readFromFile(tokenizer, argv[1]);
+  } else {
+    readFromStdin(tokenizer);
   }
 
   auto const& fileTokens = tokenizer->tokens();
